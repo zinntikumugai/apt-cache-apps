@@ -48,7 +48,7 @@ Ubuntu向けaptキャッシュサーバー（apt-cacher-ng）のKubernetesマニ
 
 **base/statefulset.yaml**
 - `image`: コンテナイメージ（例: `ghcr.io/<org>/apt-cacher-ng:stable`）
-- `storageClassName`: ストレージクラス名（例: `truenas-nfs`）
+- `storageClassName`: ストレージクラス名（例: `truenas-nfs-csi`）
 - `storage`: PVCサイズ（例: `300Gi`）
 
 **base/configmap.yaml**
