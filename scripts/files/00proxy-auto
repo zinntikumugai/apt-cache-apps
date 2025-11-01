@@ -1,0 +1,3 @@
+Acquire::http::Proxy-Auto-Detect "__DETECT_PATH__";
+Acquire::https::Proxy-Auto-Detect "__DETECT_PATH__";
+Acquire::Retries "3";

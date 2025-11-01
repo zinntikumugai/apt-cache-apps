@@ -1,0 +1,68 @@
+#cloud-config
+
+write_files:
+  - path: /usr/local/bin/apt-proxy-autodetect
+    permissions: '0755'
+    owner: root:root
+    content: |
+      #!/bin/bash
+      set -euo pipefail
+
+      APT_VIP="172.16.99.17"
+      APT_PORT="3142"
+      APT_TIMEOUT_SEC="1"
+      ALT_HOSTS="apt-cacher.service.z1n.in:3142"
+
+      check_host() {
+        local host="$1"
+        local port="$2"
+        local timeout="$3"
+
+        if command -v timeout >/dev/null 2>&1; then
+          if timeout "${timeout}" bash -c "exec 3<>/dev/tcp/${host}/${port}" 2>/dev/null; then
+            exec 3>&-
+            return 0
+          fi
+        elif command -v nc >/dev/null 2>&1; then
+          if nc -z -w "${timeout}" "${host}" "${port}" >/dev/null 2>&1; then
+            return 0
+          fi
+        else
+          if bash -c "exec 3<>/dev/tcp/${host}/${port}" 2>/dev/null; then
+            exec 3>&-
+            return 0
+          fi
+        fi
+        return 1
+      }
+
+      if [ -n "${ALT_HOSTS}" ]; then
+        IFS=',' read -ra HOSTS <<< "${ALT_HOSTS}"
+        for host_port in "${HOSTS[@]}"; do
+          host="${host_port%:*}"
+          port="${host_port##*:}"
+          if check_host "${host}" "${port}" "${APT_TIMEOUT_SEC}"; then
+            echo "http://${host}:${port}"
+            exit 0
+          fi
+        done
+      fi
+
+      if check_host "${APT_VIP}" "${APT_PORT}" "${APT_TIMEOUT_SEC}"; then
+        echo "http://${APT_VIP}:${APT_PORT}"
+        exit 0
+      fi
+
+      echo "DIRECT"
+      exit 0
+
+  - path: /etc/apt/apt.conf.d/00proxy-auto
+    permissions: '0644'
+    owner: root:root
+    content: |
+      Acquire::http::Proxy-Auto-Detect "/usr/local/bin/apt-proxy-autodetect";
+      Acquire::https::Proxy-Auto-Detect "/usr/local/bin/apt-proxy-autodetect";
+      Acquire::Retries "3";
+
+runcmd:
+  - /usr/local/bin/apt-proxy-autodetect

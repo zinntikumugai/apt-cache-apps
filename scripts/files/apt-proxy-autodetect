@@ -1,0 +1,50 @@
+#!/bin/bash
+set -euo pipefail
+
+APT_VIP="__APT_VIP__"
+APT_PORT="__APT_PORT__"
+APT_TIMEOUT_SEC="__APT_TIMEOUT_SEC__"
+ALT_HOSTS="__ALT_HOSTS__"
+
+check_host() {
+  local host="$1"
+  local port="$2"
+  local timeout="$3"
+
+  if command -v timeout >/dev/null 2>&1; then
+    if timeout "${timeout}" bash -c "exec 3<>/dev/tcp/${host}/${port}" 2>/dev/null; then
+      exec 3>&-
+      return 0
+    fi
+  elif command -v nc >/dev/null 2>&1; then
+    if nc -z -w "${timeout}" "${host}" "${port}" >/dev/null 2>&1; then
+      return 0
+    fi
+  else
+    if bash -c "exec 3<>/dev/tcp/${host}/${port}" 2>/dev/null; then
+      exec 3>&-
+      return 0
+    fi
+  fi
+  return 1
+}
+
+if [ -n "${ALT_HOSTS}" ]; then
+  IFS=',' read -ra HOSTS <<< "${ALT_HOSTS}"
+  for host_port in "${HOSTS[@]}"; do
+    host="${host_port%:*}"
+    port="${host_port##*:}"
+    if check_host "${host}" "${port}" "${APT_TIMEOUT_SEC}"; then
+      echo "http://${host}:${port}"
+      exit 0
+    fi
+  done
+fi
+
+if check_host "${APT_VIP}" "${APT_PORT}" "${APT_TIMEOUT_SEC}"; then
+  echo "http://${APT_VIP}:${APT_PORT}"
+  exit 0
+fi
+
+echo "DIRECT"
+exit 0
