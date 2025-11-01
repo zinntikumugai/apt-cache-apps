@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: apt-cacher-ng
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: apt-cacher-ng
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/<org>/<repo>.git
+    targetRevision: main
+    path: overlays/prod
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: apt-cache
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true

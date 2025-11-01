@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: apt-cacher-ng-config
+  namespace: apt-cache
+  labels:
+    app.kubernetes.io/name: apt-cacher-ng
+data:
+  acng.conf: |
+    CacheDir: /var/cache/apt-cacher-ng
+    CacheDirSize: 300
+    BindAddress: 0.0.0.0
+    Port: 3142
+    ExTreshold: 4
+    Remap-debrep: file:deb_mirror*.gz /debian ; file:backends_debian
+    Remap-uburep: file:ubuntu_mirrors /ubuntu ; file:backends_ubuntu
+    Remap-debvol: file:debvol_mirror*.gz /debian-volatile ; file:backends_debvol
+    ReportPage: acng-report.html
+    VerboseLog: 1
