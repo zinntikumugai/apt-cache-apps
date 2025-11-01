@@ -8,12 +8,24 @@ metadata:
 data:
   acng.conf: |
     CacheDir: /var/cache/apt-cacher-ng
-    CacheDirSize: 300
+    LogDir: /var/log/apt-cacher-ng
     BindAddress: 0.0.0.0
     Port: 3142
-    ExTreshold: 4
+
+    # Expiration: Remove unreferenced files after X days
+    ExThreshold: 4
+
+    # Repository remapping
     Remap-debrep: file:deb_mirror*.gz /debian ; file:backends_debian
     Remap-uburep: file:ubuntu_mirrors /ubuntu ; file:backends_ubuntu
     Remap-debvol: file:debvol_mirror*.gz /debian-volatile ; file:backends_debvol
+
+    # Web interface
     ReportPage: acng-report.html
+
+    # Logging
     VerboseLog: 1
+
+    # Performance
+    ReuseConnections: 1
+    PipelineDepth: 255
