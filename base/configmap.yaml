@@ -29,3 +29,6 @@ data:
     # Performance
     ReuseConnections: 1
     PipelineDepth: 255
+    
+    # allow HTTPS CONNECT for any host:443
+    PassThroughPattern: ^.*:443$
