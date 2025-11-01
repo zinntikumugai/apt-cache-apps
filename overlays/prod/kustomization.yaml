@@ -6,9 +6,17 @@ namespace: apt-cache
 resources:
 - ../../base
 
-replicas:
-- name: apt-cacher-ng
-  count: 2
+patches:
+- path: service-patch.yaml
+  target:
+    kind: Service
+    name: apt-cacher-ng
 
-commonLabels:
-  app.kubernetes.io/environment: production
+replicas:
+- count: 2
+  name: apt-cacher-ng
+
+labels:
+- includeSelectors: true
+  pairs:
+    app.kubernetes.io/environment: production

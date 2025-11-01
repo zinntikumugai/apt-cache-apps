@@ -20,7 +20,8 @@
 		},
 		"./local-features/copy-kube-config": {},
 		"ghcr.io/anthropics/devcontainer-features/claude-code:1": {},
-		"ghcr.io/jsburckhardt/devcontainer-features/uv:1": {}
+		"ghcr.io/jsburckhardt/devcontainer-features/uv:1": {},
+		"ghcr.io/rio/features/kustomize:1.1.2": {}
 	},
 
 	"remoteEnv": {

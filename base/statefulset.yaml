@@ -26,7 +26,7 @@ spec:
       terminationGracePeriodSeconds: 15
       containers:
       - name: apt-cacher-ng
-        image: ghcr.io/<org>/apt-cacher-ng:stable
+        image: ghcr.io/zinntikumugai/apt-cache-docker:latest
         ports:
         - name: http
           containerPort: 3142
