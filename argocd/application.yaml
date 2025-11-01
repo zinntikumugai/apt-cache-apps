@@ -12,7 +12,7 @@ spec:
   source:
     path: overlays/prod
     repoURL: https://github.com/zinntikumugai/apt-cache-apps.git
-    targetRevision: main
+    targetRevision: master
   sources: []
   project: default
   syncPolicy:
